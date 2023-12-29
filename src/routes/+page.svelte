@@ -1,5 +1,22 @@
 <script lang="ts">
+	import Overlay from '$lib/components/Overlay.svelte';
 	import { onMount } from 'svelte';
+
+	let frames = 0;
+	let response = '';
+	let thinking = false;
+
+	let prompt = `Analyze a pong game where you're the left player. The ball's position and direction, as well as your paddle's position, are shown. Your task is to choose the best move to counter the ball. Here's how to proceed:
+
+- **Step 1**: Assess the ball's current position and direction (left, right, up, or down).
+- **Step 2**: Evaluate your paddle's current position in relation to the ball.
+- **Step 3**: Predict the ball's trajectory based on its current direction and position.
+- **Step 4**: Decide on the optimal move to position your paddle effectively against the predicted trajectory of the ball.
+- **Step 5**: Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. Choose one of these based on the analysis.
+
+Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasize that the valid outputs are only 'Q', 'A', or 'Space' for the final line, with no verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`;
+
+	// `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`,
 
 	function extractKeys(text) {
 		// Regular expression to find the keys 'Q', 'A', and 'Space'
@@ -29,7 +46,7 @@
 		let direction;
 
 		let leftPaddleY = canvas.height / 2 - 30;
-		const paddleHeight = 60;
+		const paddleHeight = 80;
 		const paddleWidth = 10;
 		let leftScore = 0;
 		let rightScore = 0;
@@ -93,11 +110,27 @@
 			const baseRightX = x + radius * Math.cos(angle - Math.PI / 2);
 			const baseRightY = y + radius * Math.sin(angle - Math.PI / 2);
 
+			// Draw arrow stem
+
+			// Arrow stem end point, positioned at the edge of the ball
+			const stemEndX = x - radius * Math.cos(angle);
+			const stemEndY = y - radius * Math.sin(angle);
+
+			// Draw the stem of the arrow
+			context.strokeStyle = '#000'; // Black color for the arrow stem
+			context.lineWidth = 6; // Make the stem thicker
+			context.beginPath();
+			context.moveTo(x, y); // Start at the ball's center
+			context.lineTo(stemEndX, stemEndY); // Draw to the edge of the ball
+			context.stroke(); // Render the stem
+
+			// Draw arrow head and base
+			context.fillStyle = '#000'; // Set the color for the arrow head and base
+			context.beginPath();
 			context.moveTo(arrowHeadX, arrowHeadY);
 			context.lineTo(baseLeftX, baseLeftY);
 			context.lineTo(baseRightX, baseRightY);
 			context.lineTo(arrowHeadX, arrowHeadY);
-
 			context.closePath();
 			context.fill();
 		}
@@ -168,6 +201,7 @@
 		}
 
 		async function game(key) {
+			frames += 1;
 			if (key === 'Q' && leftPaddleY > 0) {
 				leftPaddleY -= 20;
 			} else if (key === 'A' && leftPaddleY < canvas.height - paddleHeight) {
@@ -180,7 +214,12 @@
 			render();
 
 			if (direction === 'Left') {
-				game(await getBestKey());
+				if (frames % 20 == 0) {
+					game(await getBestKey());
+				} else {
+					await sleep(1000 / 50);
+					game('');
+				}
 			} else {
 				await sleep(1000 / 50);
 				game('');
@@ -188,6 +227,7 @@
 		}
 
 		async function getBestKey() {
+			thinking = true;
 			const res = await fetch('http://localhost:11434/api/generate', {
 				method: 'POST',
 				headers: {
@@ -195,8 +235,8 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					model: 'llava',
-					prompt: `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`,
+					model: 'llava:13b',
+					prompt: prompt,
 					images: [canvas.toDataURL('image/jpeg').split(';base64,')[1]],
 					stream: false
 				})
@@ -211,9 +251,13 @@
 					return null;
 				});
 
+			response = res.response;
+
 			const keys = extractKeys(res.response);
 
 			console.log(keys, res);
+
+			thinking = false;
 
 			return keys.length > 0 ? keys.at(-1) : 'Space';
 		}
@@ -240,4 +284,12 @@
 	});
 </script>
 
-<canvas id="pongCanvas" width="600" height="400"></canvas>
+<div class=" w-[600px] h-[400px]">
+	<Overlay show={thinking} content={'Thinking...'}>
+		<canvas id="pongCanvas" width="600" height="400"></canvas>
+	</Overlay>
+</div>
+
+<div>
+	{response}
+</div>
