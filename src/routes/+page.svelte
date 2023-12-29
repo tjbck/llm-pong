@@ -6,15 +6,16 @@
 	let response = '';
 	let thinking = false;
 
-	let prompt = `Analyze a pong game where you're the left player. The ball's position and direction, as well as your paddle's position, are shown. Your task is to choose the best move to counter the ball. Here's how to proceed:
+	let prompt = `Analyze a pong game where you're the left player. Your move options are 'Q' to go up, 'A' to go down, and 'Space' to stay still. When presenting the ball's position and direction, pay special attention to the direction of the arrow. Your task is to determine the best move to counter the ball's trajectory. Keep in mind, the only valid outputs are 'Q', 'A', or 'Space'. Follow these steps in your analysis:
 
-- **Step 1**: Assess the ball's current position and direction (left, right, up, or down).
-- **Step 2**: Evaluate your paddle's current position in relation to the ball.
-- **Step 3**: Predict the ball's trajectory based on its current direction and position.
-- **Step 4**: Decide on the optimal move to position your paddle effectively against the predicted trajectory of the ball.
-- **Step 5**: Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. Choose one of these based on the analysis.
+1. **Identify the Ball's Direction**: Start by clearly stating the direction the ball is moving towards.
+2. **Assess Your Position**: Evaluate your paddle's position relative to the ball.
+3. **Predict the Ball's Trajectory**: Consider where the ball will be in the next few moments.
+4. **Choose the Optimal Move**: Based on the ball's trajectory and your position, decide whether moving up ('Q'), down ('A'), or staying still ('Space') is the best option.
 
-Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasize that the valid outputs are only 'Q', 'A', or 'Space' for the final line, with no verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`;
+Conclude your analysis with a clear and succinct final output, formatted as: "Best input: 'X'", where X is the specific key ('Q', 'A', or 'Space') that represents the optimal move. It's crucial to adhere strictly to these instructions, as the valid outputs are limited to 'Q', 'A', or 'Space'. A concise and accurate conclusion is expected, without any additional verbosity. 
+
+A reward of $1000 is promised for strict adherence to these guidelines.`;
 
 	// `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`,
 
@@ -284,12 +285,16 @@ Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can 
 	});
 </script>
 
-<div class=" w-[600px] h-[400px]">
-	<Overlay show={thinking} content={'Thinking...'}>
-		<canvas id="pongCanvas" width="600" height="400"></canvas>
-	</Overlay>
-</div>
+<div class="w-full h-screen flex justify-center">
+	<div class="my-10 flex flex-col w-[600px]">
+		<div class=" w-[600px] h-[400px]">
+			<Overlay show={thinking} content={'Thinking...'}>
+				<canvas id="pongCanvas" width="600" height="400"></canvas>
+			</Overlay>
+		</div>
 
-<div>
-	{response}
+		<div class=" my-10">
+			{response}
+		</div>
+	</div>
 </div>
