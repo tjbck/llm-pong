@@ -18,9 +18,15 @@
 		return keys;
 	}
 
+	function sleep(ms) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
 	onMount(() => {
 		const canvas = document.getElementById('pongCanvas');
 		const context = canvas.getContext('2d');
+
+		let direction;
 
 		let leftPaddleY = canvas.height / 2 - 30;
 		const paddleHeight = 60;
@@ -63,6 +69,19 @@
 
 			// Calculate angle of the arrow based on ball velocity
 			const angle = Math.atan2(velocityY, velocityX);
+
+			// Convert angle to degrees for better readability
+			const angleInDegrees = (angle * 180) / Math.PI;
+
+			// Determine direction based on angle
+
+			if (angleInDegrees >= -90 && angleInDegrees <= 90) {
+				direction = 'Right';
+			} else {
+				direction = 'Left';
+			}
+
+			console.log(`The object is heading ${direction}.`);
 
 			// Arrow head coordinates
 			const arrowHeadX = x + radius * Math.cos(angle);
@@ -160,7 +179,12 @@
 			update();
 			render();
 
-			game(await getBestKey());
+			if (direction === 'Left') {
+				game(await getBestKey());
+			} else {
+				await sleep(1000 / 50);
+				game('');
+			}
 		}
 
 		async function getBestKey() {
@@ -197,18 +221,18 @@
 		// Control the left paddle
 		// document.addEventListener('keydown', (event) => {
 		// 	const key = event.key.toLowerCase();
-		// if (key === 'q' && leftPaddleY > 0) {
-		// 	leftPaddleY -= 20;
-		// 	game();
-		// } else if (key === 'a' && leftPaddleY < canvas.height - paddleHeight) {
-		// 	leftPaddleY += 20;
-		// 	game();
-		// } else if (key === ' ') {
-		// 	game();
-		// }
+		// 	if (key === 'q' && leftPaddleY > 0) {
+		// 		leftPaddleY -= 20;
+		// 		game();
+		// 	} else if (key === 'a' && leftPaddleY < canvas.height - paddleHeight) {
+		// 		leftPaddleY += 20;
+		// 		game();
+		// 	} else if (key === ' ') {
+		// 		game();
+		// 	}
 		// });
 
-		game();
+		game('');
 
 		// Loop the game
 		// setInterval(game, 1000 / 50); // 50 times per second
