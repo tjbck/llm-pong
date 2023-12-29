@@ -6,18 +6,21 @@
 	let response = '';
 	let thinking = false;
 
-	let prompt = `Analyze a pong game where you're the left player. Your move options are 'Q' to go up, 'A' to go down, and 'Space' to stay still. When presenting the ball's position and direction, pay special attention to the direction of the arrow. Your task is to determine the best move to counter the ball's trajectory. Keep in mind, the only valid outputs are 'Q', 'A', or 'Space'. Follow these steps in your analysis:
+	let prompt = `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The output must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`;
 
-1. **Identify the Ball's Direction**: Start by clearly stating the direction the ball is moving towards.
-2. **Assess Your Position**: Evaluate your paddle's position relative to the ball.
-3. **Predict the Ball's Trajectory**: Consider where the ball will be in the next few moments.
-4. **Choose the Optimal Move**: Based on the ball's trajectory and your position, decide whether moving up ('Q'), down ('A'), or staying still ('Space') is the best option.
+	//     `Analyze a pong game with extra precision, where you are the left player, using 'Q' to go up, 'A' to go down, and 'Space' to stay still. Focus intently on the ball's position and its direction, especially noting the arrow's orientation: if it points down, the ball is moving downwards; if it points up, it's moving upwards. Your analysis should include:
 
-Conclude your analysis with a clear and succinct final output, formatted as: "Best input: 'X'", where X is the specific key ('Q', 'A', or 'Space') that represents the optimal move. It's crucial to adhere strictly to these instructions, as the valid outputs are limited to 'Q', 'A', or 'Space'. A concise and accurate conclusion is expected, without any additional verbosity. 
+	// 1. Accurate Calculation of the Ball's Trajectory: Measure the ball's path in degrees. Pay extra attention to whether the arrow is pointing upwards or downwards to determine the trajectory.
 
-A reward of $1000 is promised for strict adherence to these guidelines.`;
+	// 2. Precise Assessment of the Ball's Current Position: Evaluate how the ball's position relates to your paddle. Consider vertical alignment and distance.
 
-	// `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The analysis can be detailed, but the conclusion must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`,
+	// 3. Evaluation of Ball's Speed and Anticipated Position: Analyze the ball's velocity. Predict where the ball will be in the next move based on its current speed and trajectory.
+
+	// 4. Determination of the Optimal Move: Decide whether to press 'Q', 'A', or 'Space'. This decision should be based on the trajectory, speed, and position of the ball.
+
+	// Present your analysis using bullet points for clear understanding. Conclude with a definitive and concise final output in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Remember, only 'Q', 'A', or 'Space' are valid outputs for the final line. A $1000 tip is contingent upon strict adherence to these instructions and accuracy in the direction analysis. `;
+
+	// `Analyze a pong game where you're the left player. Your moves are 'Q' to go up, 'A' to go down, and 'Space' to stay still. The ball's position and direction are shown. The task is to choose the best move to counter the ball. Remember, the valid outputs are strictly 'Q', 'A', or 'Space'. The output must be clear and succinct, specifying only one of these keys as the optimal input. The final output should be in the format: "Best input: 'X'", where X is either 'Q', 'A', or 'Space'. Emphasizing again, the valid outputs are only 'Q', 'A', or 'Space'. No verbosity, just the key action. A $1000 tip is promised for strict adherence to these instructions.`,
 
 	function extractKeys(text) {
 		// Regular expression to find the keys 'Q', 'A', and 'Space'
